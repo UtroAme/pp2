@@ -1,0 +1,12 @@
+ 
+banana_apple is a fruit combination.
+best_match found in the dataset.
+Some_random_text with snake_case_words.
+HelloWorld and CamelCaseExample.
+ConvertThisToSnakeCase.
+This sentence contains a mix of UpperCase and lowercase words.
+email_address@example.com is a valid email.
+Find sequences of lowercase_words_with_underscores.
+There are numbers like 123 and special characters !@#$%^&*() in this text.
+a string that ends with b.
+Another example where a...b should match.
