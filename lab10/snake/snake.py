@@ -58,6 +58,10 @@ def save_game(user_id, score, level, snake_obj):
     cur.close()
     conn.close()
 
+SCORE = 0
+LEVEL = 0
+
+#запрос на имя и как в дальнейшем игра запуститься
 username = input("Enter your username: ")
 user_id, saved_data = get_or_create_user(username)
 
@@ -227,9 +231,6 @@ food = Food()
 snake = Snake()
 food.spawn(snake)
 
-#запрос на имя и как в дальнейшем игра запуститься
-username = input("Enter your username: ")
-user_id, saved_data = get_or_create_user(username)
 
 if saved_data:
     SCORE, LEVEL, game_state = saved_data
