@@ -107,6 +107,12 @@ def add_coin():
         money.add(new_coin)
         all_sprites.add(new_coin)
 
+def add_enemy():
+    if len(enemies) < 1:
+        new_enemy = Enemy()
+        enemies.add(new_enemy)
+        all_sprites.add(new_enemy)
+
 #Setting up sprites     
 P1 = Player()
 E1 = Enemy()
@@ -137,13 +143,15 @@ while RUN:
             sys.exit()
     
     DISPLAYSURF.blit(background, (0,0)) #рисует фон
-    scores = font_small.render(f"Coins: {SCORE}", True, BLACK)
+    scores = font_small.render(f"Score: {SCORE}", True, BLACK)
     coins = font_small.render(f"Coins: {COINS}", True, BLACK)
     DISPLAYSURF.blit(scores, (10,10))
     DISPLAYSURF.blit(coins, (300,10))
 
     #adding coins
     add_coin()
+
+
     
     #Moves and Re-draws all Sprites
     for entity in all_sprites:
@@ -161,16 +169,20 @@ while RUN:
     if pygame.sprite.spritecollideany(P1, enemies): #второй должен быть ene,y или all_sprites
           pygame.mixer.Sound('lab9-beta/racer/crash.wav').play() #добовляет и воспроизводит звук
           time.sleep(0.5)
+          collision_enemy = pygame.sprite.spritecollide(P1, enemies, True)
+          COINS -= 1
+          add_enemy()
+
+    if COINS < 0:
+        DISPLAYSURF.fill(RED)
+        DISPLAYSURF.blit(game_over, (30,250))
           
-          DISPLAYSURF.fill(RED)
-          DISPLAYSURF.blit(game_over, (30,250))
-          
-          pygame.display.update()
-          for entity in all_sprites:
-                entity.kill() #удалит спрайт из группы
-          time.sleep(2)
-          pygame.quit()
-          sys.exit() 
+        pygame.display.update()
+        for entity in all_sprites:
+            entity.kill() #удалит спрайт из группы
+        time.sleep(2)
+        pygame.quit()
+        sys.exit() 
          
     pygame.display.update()
     FramePerSec.tick(FPS)
