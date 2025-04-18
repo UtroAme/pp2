@@ -6,53 +6,6 @@ import psycopg2
 import json
 from configparser import ConfigParser
 
-#initializing
-pygame.init()
-
-#setting up FPS
-FPS = 5
-FramePerSec = pygame.time.Clock()
- 
-# Predefined some colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREY = (100,100,100)
- 
-# Screen information
-SCREEN_WIDTH = 600
-SCREEN_HEIGHT = 600
-screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
-pygame.display.set_caption("Snake Game")
-
-#constant
-CELL = 30
-FOOD_LIFETIME = 5000 #5s= 500 ms
-
-#Fruit png
-fruit1 = pygame.image.load("lab9-beta/snake/blackberry.png")
-fruit2 = pygame.image.load("lab9-beta/snake/strawberry.png")
-fruit3 = pygame.image.load("lab9-beta/snake/watermelon.png")
-fruits = [fruit1, fruit2, fruit3]
-
-#Variables
-done = False
-SCORE = 0
-LEVEL = 1
-font = pygame.font.Font(None, 36)
-
-#Background
-def draw_grid():
-    for i in range(SCREEN_HEIGHT//CELL):
-        for j in range(SCREEN_WIDTH//CELL):
-            pygame.draw.rect(screen ,GREY, (i*CELL, j*CELL, CELL, CELL))
-
-def draw_grid_chess():
-    colors= [WHITE, GREY]
-
-    for i in range(SCREEN_HEIGHT//CELL):
-        for j in range(SCREEN_WIDTH//CELL):
-            pygame.draw.rect(screen, colors[(i+j)%2], (i*CELL, j*CELL, CELL, CELL))
-
 #connecting database
 def load_config(filename='lab10/snake/database.ini', section='postgresql'):
     parser = ConfigParser()
@@ -104,6 +57,99 @@ def save_game(user_id, score, level, snake_obj):
     conn.commit()
     cur.close()
     conn.close()
+
+username = input("Enter your username: ")
+user_id, saved_data = get_or_create_user(username)
+
+#initializing
+pygame.init()
+
+#setting up FPS
+FPS = 5
+FramePerSec = pygame.time.Clock()
+ 
+# Predefined some colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREY = (100,100,100)
+ 
+# Screen information
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
+screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
+pygame.display.set_caption("Snake Game")
+
+#constant
+CELL = 30
+FOOD_LIFETIME = 5000 #5s= 500 ms
+GRID_WIDTH = SCREEN_WIDTH // CELL
+GRID_HEIGHT = SCREEN_HEIGHT // CELL
+
+#Fruit png
+fruit1 = pygame.image.load("lab9-beta/snake/blackberry.png")
+fruit2 = pygame.image.load("lab9-beta/snake/strawberry.png")
+fruit3 = pygame.image.load("lab9-beta/snake/watermelon.png")
+fruits = [fruit1, fruit2, fruit3]
+
+#Variables
+done = False
+font = pygame.font.Font(None, 36)
+
+#Background
+def draw_grid():
+    for i in range(SCREEN_HEIGHT//CELL):
+        for j in range(SCREEN_WIDTH//CELL):
+            pygame.draw.rect(screen ,GREY, (i*CELL, j*CELL, CELL, CELL))
+
+def draw_grid_chess():
+    colors= [WHITE, GREY]
+
+    for i in range(SCREEN_HEIGHT//CELL):
+        for j in range(SCREEN_WIDTH//CELL):
+            pygame.draw.rect(screen, colors[(i+j)%2], (i*CELL, j*CELL, CELL, CELL))
+
+#Level
+def get_level(score):
+    """Returns the level based on the player's score."""
+    if score < 5:
+        return 0
+    elif score < 10:
+        return 1
+    else:
+        return 2
+
+def get_speed(level):
+    """Base speed for each level."""
+    if level == 0:
+        return 8
+    elif level == 1:
+        return 12
+    else:
+        return 15
+
+def get_walls_for_level(level):
+    """Generate a set of wall coordinates for each level."""
+    walls = set()
+    # Level 0: border only
+    if level >= 0:
+        for x in range(GRID_WIDTH):
+            walls.add((x, 0))
+            walls.add((x, GRID_HEIGHT - 1))
+        for y in range(GRID_HEIGHT):
+            walls.add((0, y))
+            walls.add((GRID_WIDTH - 1, y))
+
+    # Level 1: add a simple diagonal
+    if level >= 1:
+        for i in range(5, 15):
+            walls.add((i, i))
+
+    # Level 2: add some extra blocks in the center
+    if level >= 2:
+        for i in range(10, 20):
+            walls.add((i, GRID_HEIGHT - i))
+
+    return walls
 
 #variable
 class Point:
